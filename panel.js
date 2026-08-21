@@ -89,10 +89,16 @@ const renderSellers = (rows) => {
     const pending = !seller.is_active && !seller.approved_at;
     const label = pending ? 'Aprobar' : seller.is_active ? 'Desactivar' : 'Reactivar';
     const stateClass = pending ? 'pending' : seller.is_active ? 'active' : 'inactive';
-    const publicLink = seller.is_active ? `<a class="seller-link" target="_blank" href="/?vendedor=${encodeURIComponent(seller.slug)}">${escapeHtml(seller.slug)}</a>` : `<span class="seller-link muted">${escapeHtml(seller.slug)}</span>`;
+    const sellerUrl = `${config.siteUrl}/?vendedor=${encodeURIComponent(seller.slug)}`;
+    const publicLink = seller.is_active ? `<span class="seller-link-row"><a class="seller-link" target="_blank" href="${sellerUrl}">${escapeHtml(seller.slug)}</a><button class="copy-seller-link" type="button" data-link="${sellerUrl}">Copiar link</button></span>` : `<span class="seller-link muted">${escapeHtml(seller.slug)}</span>`;
     return `<tr><td><span class="seller-name">${escapeHtml(seller.name)}</span><br>${publicLink}</td><td>${escapeHtml(seller.email)}<br>+${escapeHtml(seller.whatsapp)}</td><td>${number(seller.link_views)}</td><td>${number(seller.unit_views)}</td><td>${number(seller.whatsapp_clicks)}</td><td><button class="status-pill ${stateClass}" data-id="${seller.id}" data-active="${seller.is_active}">${label}</button></td></tr>`;
   }).join('');
   tbody.querySelectorAll('.status-pill').forEach((button) => button.addEventListener('click', () => toggleSeller(button)));
+  tbody.querySelectorAll('.copy-seller-link').forEach((button) => button.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(button.dataset.link);
+    button.textContent = 'Copiado';
+    window.setTimeout(() => { button.textContent = 'Copiar link'; }, 1800);
+  }));
   pagination.hidden = pageCount <= 1;
   pagination.querySelector('span').textContent = `Página ${sellerPage} de ${pageCount} · ${rows.length} vendedores`;
   pagination.querySelector('[data-page="prev"]').disabled = sellerPage === 1;

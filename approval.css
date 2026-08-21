@@ -1,3 +1,6 @@
 .seller-link.muted { opacity: .45; }
 .status-pill.pending { background: #fff1cc; color: #765400; border-color: #d8b24f; }
 .seller-pagination[hidden] { display: none !important; }
+.seller-link-row { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .45rem; }
+.copy-seller-link { border: 1px solid var(--line); border-radius: 99px; background: #fff; color: var(--ink); padding: .28rem .55rem; font: 600 .65rem var(--sans); cursor: pointer; }
+.copy-seller-link:hover { border-color: var(--accent); }
