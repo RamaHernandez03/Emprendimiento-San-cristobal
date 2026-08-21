@@ -3,8 +3,14 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const PUBLISHABLE_KEY = 'sb_publishable_Uq7vjz4xbwXwRqWSFZwjHw_6tIlz2nX';
-const SITE_URL = 'https://carloscalvo2500.netlify.app';
-const allowedOrigins = new Set([SITE_URL, 'http://localhost:8080', 'http://127.0.0.1:8080']);
+const SITE_URL = 'https://carloscalvo2590.com';
+const allowedOrigins = new Set([
+  SITE_URL,
+  'https://www.carloscalvo2590.com',
+  'https://carloscalvo2500.netlify.app',
+  'http://localhost:8080',
+  'http://127.0.0.1:8080'
+]);
 
 const cors = (origin: string | null) => ({
   'Access-Control-Allow-Origin': origin && allowedOrigins.has(origin) ? origin : SITE_URL,
