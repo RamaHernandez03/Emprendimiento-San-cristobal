@@ -74,14 +74,14 @@ Deno.serve(async (req) => {
     const result = await db('sellers', {
       method: 'POST',
       headers: { Prefer: 'return=representation' },
-      body: JSON.stringify({ name, email, whatsapp, slug })
+      body: JSON.stringify({ name, email, whatsapp, slug, is_active: false })
     });
     if (!result.ok) {
       const error = await result.json().catch(() => ({}));
       if (error.code === '23505') return response({ error: 'Ya existe un vendedor registrado con ese email.' }, 409, origin);
       return response({ error: 'No se pudo generar el link. Intentá nuevamente.' }, 500, origin);
     }
-    return response({ seller: { name, slug, link: `${SITE_URL}/?vendedor=${encodeURIComponent(slug)}` } }, 201, origin);
+    return response({ seller: { name, slug, pending: true } }, 201, origin);
   }
 
   if (action === 'track') {

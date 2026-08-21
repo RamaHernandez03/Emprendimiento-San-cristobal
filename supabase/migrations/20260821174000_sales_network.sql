@@ -14,7 +14,9 @@ create table public.sellers (
   email text not null check (char_length(email) between 5 and 254),
   whatsapp text not null check (whatsapp ~ '^549[0-9]{10}$'),
   slug text not null unique check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
-  is_active boolean not null default true,
+  is_active boolean not null default false,
+  approved_at timestamptz,
+  approved_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -64,6 +66,24 @@ $$;
 create trigger sellers_set_updated_at
 before update on public.sellers
 for each row execute function private.set_updated_at();
+
+create or replace function private.set_seller_approval()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if new.is_active and not old.is_active then
+    new.approved_at = coalesce(new.approved_at, now());
+    new.approved_by = coalesce(new.approved_by, auth.uid());
+  end if;
+  return new;
+end;
+$$;
+
+create trigger sellers_set_approval
+before update of is_active on public.sellers
+for each row execute function private.set_seller_approval();
 
 alter table public.admins enable row level security;
 alter table public.sellers enable row level security;
@@ -116,7 +136,7 @@ create view public.admin_seller_stats
 with (security_invoker = true)
 as
 select
-  s.id, s.name, s.email, s.whatsapp, s.slug, s.is_active, s.created_at,
+  s.id, s.name, s.email, s.whatsapp, s.slug, s.is_active, s.approved_at, s.approved_by, s.created_at,
   count(e.id) filter (where e.event_type = 'seller_link_view') as link_views,
   count(e.id) filter (where e.event_type = 'unit_view') as unit_views,
   count(e.id) filter (where e.event_type = 'whatsapp_click') as whatsapp_clicks,

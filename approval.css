@@ -1,0 +1,3 @@
+.seller-link.muted { opacity: .45; }
+.status-pill.pending { background: #fff1cc; color: #765400; border-color: #d8b24f; }
+.seller-pagination[hidden] { display: none !important; }

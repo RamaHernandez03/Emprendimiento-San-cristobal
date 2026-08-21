@@ -3,8 +3,6 @@ const form = document.querySelector('#seller-form');
 const statusNode = document.querySelector('#form-status');
 const submitButton = form.querySelector('button[type="submit"]');
 const successBox = document.querySelector('#success-box');
-const linkInput = document.querySelector('#seller-link');
-const openLink = document.querySelector('#open-link');
 const whatsappInput = document.querySelector('#seller-whatsapp');
 
 const normalizeNationalNumber = (value) => {
@@ -45,9 +43,7 @@ form.addEventListener('submit', async (event) => {
   submitButton.disabled = true;
   submitButton.textContent = 'Generando…';
   try {
-    const result = await apiRequest({ action:'registerSeller', name:data.get('name'), email:data.get('email'), whatsapp });
-    linkInput.value = result.seller.link;
-    openLink.href = result.seller.link;
+    await apiRequest({ action:'registerSeller', name:data.get('name'), email:data.get('email'), whatsapp });
     successBox.classList.add('show');
     form.reset();
   } catch (error) {
@@ -57,9 +53,4 @@ form.addEventListener('submit', async (event) => {
     submitButton.disabled = false;
     submitButton.textContent = 'Generar mi link';
   }
-});
-
-document.querySelector('#copy-link').addEventListener('click', async () => {
-  await navigator.clipboard.writeText(linkInput.value);
-  document.querySelector('#copy-link').textContent = 'Copiado';
 });

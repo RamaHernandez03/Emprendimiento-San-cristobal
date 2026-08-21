@@ -42,6 +42,7 @@ Landing page comercial para un desarrollo inmobiliario a estrenar en Carlos Calv
 - SEO básico, metadatos y contenido semántico incluidos.
 - El copy comercial distingue datos confirmados de condiciones sujetas a consulta. La sección de preguntas frecuentes cubre entrega, tipologías, edificio, gastos, financiación, expensas, reserva, material ilustrativo y vigencia de precios.
 - `/sumate` permite registrar vendedores y genera un link personal con `?vendedor=slug`.
+- Todo vendedor nuevo queda pendiente. Jorge debe aprobarlo desde `/panel`; hasta entonces el enlace no personaliza el contacto ni atribuye actividad al vendedor.
 - El alta acepta exactamente 10 dígitos nacionales de WhatsApp y normaliza el destino al formato argentino `549…`, evitando prefijos `54` duplicados.
 - Cuando se abre un link de vendedor, todos los CTA de WhatsApp y textos de contacto se personalizan con su nombre y teléfono.
 - `/panel` es privado y muestra visitas, sesiones, aperturas de propiedades, clics a WhatsApp y rendimiento por vendedor.

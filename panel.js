@@ -85,7 +85,13 @@ const renderSellers = (rows) => {
   sellerPage = Math.min(sellerPage, pageCount);
   if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6">Todavía no hay vendedores registrados.</td></tr>'; pagination.hidden = true; return; }
   const visibleRows = rows.slice((sellerPage - 1) * sellerPageSize, sellerPage * sellerPageSize);
-  tbody.innerHTML = visibleRows.map((seller) => `<tr><td><span class="seller-name">${escapeHtml(seller.name)}</span><br><a class="seller-link" target="_blank" href="/?vendedor=${encodeURIComponent(seller.slug)}">${escapeHtml(seller.slug)}</a></td><td>${escapeHtml(seller.email)}<br>+${escapeHtml(seller.whatsapp)}</td><td>${number(seller.link_views)}</td><td>${number(seller.unit_views)}</td><td>${number(seller.whatsapp_clicks)}</td><td><button class="status-pill ${seller.is_active?'active':'inactive'}" data-id="${seller.id}" data-active="${seller.is_active}">${seller.is_active?'Activo':'Inactivo'}</button></td></tr>`).join('');
+  tbody.innerHTML = visibleRows.map((seller) => {
+    const pending = !seller.is_active && !seller.approved_at;
+    const label = pending ? 'Aprobar' : seller.is_active ? 'Desactivar' : 'Reactivar';
+    const stateClass = pending ? 'pending' : seller.is_active ? 'active' : 'inactive';
+    const publicLink = seller.is_active ? `<a class="seller-link" target="_blank" href="/?vendedor=${encodeURIComponent(seller.slug)}">${escapeHtml(seller.slug)}</a>` : `<span class="seller-link muted">${escapeHtml(seller.slug)}</span>`;
+    return `<tr><td><span class="seller-name">${escapeHtml(seller.name)}</span><br>${publicLink}</td><td>${escapeHtml(seller.email)}<br>+${escapeHtml(seller.whatsapp)}</td><td>${number(seller.link_views)}</td><td>${number(seller.unit_views)}</td><td>${number(seller.whatsapp_clicks)}</td><td><button class="status-pill ${stateClass}" data-id="${seller.id}" data-active="${seller.is_active}">${label}</button></td></tr>`;
+  }).join('');
   tbody.querySelectorAll('.status-pill').forEach((button) => button.addEventListener('click', () => toggleSeller(button)));
   pagination.hidden = pageCount <= 1;
   pagination.querySelector('span').textContent = `Página ${sellerPage} de ${pageCount} · ${rows.length} vendedores`;
@@ -102,7 +108,7 @@ const toggleSeller = async (button) => {
   const next = button.dataset.active !== 'true';
   button.disabled = true;
   const response = await dataFetch(`sellers?id=eq.${encodeURIComponent(button.dataset.id)}`, { method:'PATCH', headers:{Prefer:'return=minimal'}, body:JSON.stringify({is_active:next}) });
-  if (!response.ok) panelMessage.textContent = 'No se pudo actualizar el vendedor.';
+  if (!response.ok) panelMessage.textContent = 'No se pudo actualizar la aprobación del vendedor.';
   await loadPanel();
 };
 const loadPanel = async () => {
