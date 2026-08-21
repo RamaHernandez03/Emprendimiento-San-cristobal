@@ -31,10 +31,11 @@ const clean = (value: unknown, max = 200) => String(value ?? '').trim().slice(0,
 const slugify = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'vendedor';
 const normalizeWhatsapp = (value: unknown) => {
-  let digits = clean(value, 20).replace(/\D/g, '');
-  if (digits.startsWith('0')) digits = digits.slice(1);
-  if (!digits.startsWith('54')) digits = `54${digits}`;
-  return digits;
+  let digits = clean(value, 24).replace(/\D/g, '').replace(/^00/, '');
+  if (digits.length > 10 && digits.startsWith('54')) digits = digits.slice(2);
+  if (digits.length === 11 && digits.startsWith('9')) digits = digits.slice(1);
+  digits = digits.replace(/^0/, '');
+  return /^\d{10}$/.test(digits) ? `549${digits}` : '';
 };
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -66,7 +67,7 @@ Deno.serve(async (req) => {
     const whatsapp = normalizeWhatsapp(payload.whatsapp);
     if (name.length < 3) return response({ error: 'Ingresá nombre y apellido.' }, 422, origin);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return response({ error: 'Ingresá un email válido.' }, 422, origin);
-    if (!/^54[0-9]{10,13}$/.test(whatsapp)) return response({ error: 'Ingresá un WhatsApp válido con código de área.' }, 422, origin);
+    if (!/^549[0-9]{10}$/.test(whatsapp)) return response({ error: 'Ingresá los 10 dígitos del WhatsApp, sin +54, 0 ni 15.' }, 422, origin);
 
     const suffix = crypto.randomUUID().replace(/-/g, '').slice(0, 6);
     const slug = `${slugify(name)}-${suffix}`;

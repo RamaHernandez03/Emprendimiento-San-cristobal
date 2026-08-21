@@ -42,8 +42,10 @@ Landing page comercial para un desarrollo inmobiliario a estrenar en Carlos Calv
 - SEO básico, metadatos y contenido semántico incluidos.
 - El copy comercial distingue datos confirmados de condiciones sujetas a consulta. La sección de preguntas frecuentes cubre entrega, tipologías, edificio, gastos, financiación, expensas, reserva, material ilustrativo y vigencia de precios.
 - `/sumate` permite registrar vendedores y genera un link personal con `?vendedor=slug`.
+- El alta acepta exactamente 10 dígitos nacionales de WhatsApp y normaliza el destino al formato argentino `549…`, evitando prefijos `54` duplicados.
 - Cuando se abre un link de vendedor, todos los CTA de WhatsApp y textos de contacto se personalizan con su nombre y teléfono.
 - `/panel` es privado y muestra visitas, sesiones, aperturas de propiedades, clics a WhatsApp y rendimiento por vendedor.
+- El listado de vendedores del panel se pagina visualmente de a 10 registros.
 - Superusuario operativo: `jallaria@remax.com.ar`. Su contraseña no se versiona ni debe documentarse en el repositorio.
 - Eventos medidos: `page_view`, `seller_link_view`, `unit_view` y `whatsapp_click`.
 - Proyecto Supabase: `Carlos Calvo 2590`, referencia `ahgvuzeldnhxztbhcurt`, región São Paulo (`sa-east-1`).

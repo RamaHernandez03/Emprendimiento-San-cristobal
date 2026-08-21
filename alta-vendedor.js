@@ -5,6 +5,20 @@ const submitButton = form.querySelector('button[type="submit"]');
 const successBox = document.querySelector('#success-box');
 const linkInput = document.querySelector('#seller-link');
 const openLink = document.querySelector('#open-link');
+const whatsappInput = document.querySelector('#seller-whatsapp');
+
+const normalizeNationalNumber = (value) => {
+  let digits = String(value ?? '').replace(/\D/g, '').replace(/^00/, '');
+  if (digits.length > 10 && digits.startsWith('54')) digits = digits.slice(2);
+  if (digits.length === 11 && digits.startsWith('9')) digits = digits.slice(1);
+  digits = digits.replace(/^0/, '');
+  return digits;
+};
+
+whatsappInput.addEventListener('input', () => {
+  whatsappInput.value = normalizeNationalNumber(whatsappInput.value).slice(0, 10);
+  whatsappInput.setCustomValidity('');
+});
 
 const apiRequest = async (payload) => {
   const response = await fetch(config.functionUrl, { method:'POST', headers:{ apikey:config.anonKey, Authorization:`Bearer ${config.anonKey}`, 'Content-Type':'application/json' }, body:JSON.stringify(payload) });
@@ -19,7 +33,15 @@ form.addEventListener('submit', async (event) => {
   statusNode.classList.remove('error');
   successBox.classList.remove('show');
   const data = new FormData(form);
-  const whatsapp = `54${String(data.get('whatsapp')).replace(/\D/g,'').replace(/^0/,'')}`;
+  const nationalNumber = normalizeNationalNumber(data.get('whatsapp'));
+  if (!/^\d{10}$/.test(nationalNumber)) {
+    whatsappInput.setCustomValidity('Ingresá los 10 dígitos del número, sin +54, 0 ni 15.');
+    whatsappInput.reportValidity();
+    statusNode.textContent = 'Revisá el WhatsApp: deben ser 10 dígitos, sin +54, 0 ni 15.';
+    statusNode.classList.add('error');
+    return;
+  }
+  const whatsapp = `549${nationalNumber}`;
   submitButton.disabled = true;
   submitButton.textContent = 'Generando…';
   try {

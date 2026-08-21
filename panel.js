@@ -4,6 +4,9 @@ const loginScreen = document.querySelector('#login-screen');
 const panel = document.querySelector('#panel-content');
 const loginStatus = document.querySelector('#login-status');
 const panelMessage = document.querySelector('#panel-message');
+const sellerPageSize = 10;
+let sellerRows = [];
+let sellerPage = 1;
 
 const authFetch = (path, options = {}) => fetch(`${config.url}/auth/v1/${path}`, {
   ...options,
@@ -76,10 +79,25 @@ const renderUnits = (rows) => {
 };
 const renderSellers = (rows) => {
   const tbody = document.querySelector('#seller-table');
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6">Todavía no hay vendedores registrados.</td></tr>'; return; }
-  tbody.innerHTML = rows.map((seller) => `<tr><td><span class="seller-name">${escapeHtml(seller.name)}</span><br><a class="seller-link" target="_blank" href="/?vendedor=${encodeURIComponent(seller.slug)}">${escapeHtml(seller.slug)}</a></td><td>${escapeHtml(seller.email)}<br>+${escapeHtml(seller.whatsapp)}</td><td>${number(seller.link_views)}</td><td>${number(seller.unit_views)}</td><td>${number(seller.whatsapp_clicks)}</td><td><button class="status-pill ${seller.is_active?'active':'inactive'}" data-id="${seller.id}" data-active="${seller.is_active}">${seller.is_active?'Activo':'Inactivo'}</button></td></tr>`).join('');
+  const pagination = document.querySelector('#seller-pagination');
+  sellerRows = rows;
+  const pageCount = Math.max(1, Math.ceil(rows.length / sellerPageSize));
+  sellerPage = Math.min(sellerPage, pageCount);
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6">Todavía no hay vendedores registrados.</td></tr>'; pagination.hidden = true; return; }
+  const visibleRows = rows.slice((sellerPage - 1) * sellerPageSize, sellerPage * sellerPageSize);
+  tbody.innerHTML = visibleRows.map((seller) => `<tr><td><span class="seller-name">${escapeHtml(seller.name)}</span><br><a class="seller-link" target="_blank" href="/?vendedor=${encodeURIComponent(seller.slug)}">${escapeHtml(seller.slug)}</a></td><td>${escapeHtml(seller.email)}<br>+${escapeHtml(seller.whatsapp)}</td><td>${number(seller.link_views)}</td><td>${number(seller.unit_views)}</td><td>${number(seller.whatsapp_clicks)}</td><td><button class="status-pill ${seller.is_active?'active':'inactive'}" data-id="${seller.id}" data-active="${seller.is_active}">${seller.is_active?'Activo':'Inactivo'}</button></td></tr>`).join('');
   tbody.querySelectorAll('.status-pill').forEach((button) => button.addEventListener('click', () => toggleSeller(button)));
+  pagination.hidden = pageCount <= 1;
+  pagination.querySelector('span').textContent = `Página ${sellerPage} de ${pageCount} · ${rows.length} vendedores`;
+  pagination.querySelector('[data-page="prev"]').disabled = sellerPage === 1;
+  pagination.querySelector('[data-page="next"]').disabled = sellerPage === pageCount;
 };
+document.querySelector('#seller-pagination').addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-page]');
+  if (!button) return;
+  sellerPage += button.dataset.page === 'next' ? 1 : -1;
+  renderSellers(sellerRows);
+});
 const toggleSeller = async (button) => {
   const next = button.dataset.active !== 'true';
   button.disabled = true;

@@ -12,7 +12,7 @@ create table public.sellers (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 3 and 100),
   email text not null check (char_length(email) between 5 and 254),
-  whatsapp text not null check (whatsapp ~ '^54[0-9]{10,13}$'),
+  whatsapp text not null check (whatsapp ~ '^549[0-9]{10}$'),
   slug text not null unique check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
   is_active boolean not null default true,
   created_at timestamptz not null default now(),

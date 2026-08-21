@@ -1,1 +1,128 @@
-<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panel comercial | Calvo 2590</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"><link rel="stylesheet" href="portal.css?v=20260821-1"><script defer src="supabase-config.js?v=20260821-1"></script><script defer src="panel.js?v=20260821-1"></script></head><body class="panel-body"><section class="login-card" id="login-screen"><a class="portal-brand" href="/"><span>CC</span><strong>2590</strong></a><p class="eyebrow">Acceso privado</p><h1>Panel comercial</h1><form id="login-form"><div class="field"><label for="login-email">Email</label><input id="login-email" type="email" autocomplete="username" required></div><div class="field"><label for="login-password">Contraseña</label><input id="login-password" type="password" autocomplete="current-password" required></div><button class="portal-button" type="submit">Ingresar</button><p class="form-status" id="login-status"></p></form></section><main class="panel-shell panel-content" id="panel-content" hidden><header class="panel-header"><div><p class="eyebrow">Carlos Calvo 2590</p><h1>Panel comercial</h1></div><button class="ghost-button" id="logout-button">Cerrar sesión</button></header><div class="panel-message" id="panel-message"></div><section class="kpi-grid"><article class="kpi"><strong id="kpi-page">—</strong><span>Visitas totales</span></article><article class="kpi"><strong id="kpi-sessions">—</strong><span>Sesiones únicas</span></article><article class="kpi"><strong id="kpi-units">—</strong><span>Aperturas de propiedades</span></article><article class="kpi"><strong id="kpi-whatsapp">—</strong><span>Clics a WhatsApp</span></article><article class="kpi"><strong id="kpi-links">—</strong><span>Accesos por vendedor</span></article><article class="kpi"><strong id="kpi-sellers">—</strong><span>Vendedores activos</span></article></section><section class="panel-section"><div class="section-head"><div><h2>Actividad diaria</h2><p>Visitas de los últimos 30 días</p></div></div><div class="chart" id="daily-chart"></div></section><section class="panel-section"><div class="section-head"><div><h2>Propiedades</h2><p>Aperturas de ficha y clics a WhatsApp</p></div></div><div class="unit-metrics" id="unit-metrics"></div></section><section class="panel-section"><div class="section-head"><div><h2>Vendedores</h2><p>Rendimiento atribuido a cada link personalizado</p></div><a class="ghost-button" href="/sumate" target="_blank">Nuevo vendedor</a></div><div class="table-wrap"><table><thead><tr><th>Vendedor</th><th>Contacto</th><th>Accesos</th><th>Propiedades</th><th>WhatsApp</th><th>Estado</th></tr></thead><tbody id="seller-table"></tbody></table></div></section></main></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Panel comercial | Calvo 2590</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal.css?v=20260821-1">
+<link rel="stylesheet" href="enhancements.css?v=20260821-1">
+<script defer src="supabase-config.js?v=20260821-1">
+</script>
+<script defer src="panel.js?v=20260821-1">
+</script>
+</head>
+<body class="panel-body">
+<section class="login-card" id="login-screen">
+<a class="portal-brand" href="/">
+<span>CC</span>
+<strong>2590</strong>
+</a>
+<p class="eyebrow">Acceso privado</p>
+<h1>Panel comercial</h1>
+<form id="login-form">
+<div class="field">
+<label for="login-email">Email</label>
+<input id="login-email" type="email" autocomplete="username" required>
+</div>
+<div class="field">
+<label for="login-password">Contraseña</label>
+<input id="login-password" type="password" autocomplete="current-password" required>
+</div>
+<button class="portal-button" type="submit">Ingresar</button>
+<p class="form-status" id="login-status">
+</p>
+</form>
+</section>
+<main class="panel-shell panel-content" id="panel-content" hidden>
+<header class="panel-header">
+<div>
+<p class="eyebrow">Carlos Calvo 2590</p>
+<h1>Panel comercial</h1>
+</div>
+<button class="ghost-button" id="logout-button">Cerrar sesión</button>
+</header>
+<div class="panel-message" id="panel-message">
+</div>
+<section class="kpi-grid">
+<article class="kpi">
+<strong id="kpi-page">—</strong>
+<span>Visitas totales</span>
+</article>
+<article class="kpi">
+<strong id="kpi-sessions">—</strong>
+<span>Sesiones únicas</span>
+</article>
+<article class="kpi">
+<strong id="kpi-units">—</strong>
+<span>Aperturas de propiedades</span>
+</article>
+<article class="kpi">
+<strong id="kpi-whatsapp">—</strong>
+<span>Clics a WhatsApp</span>
+</article>
+<article class="kpi">
+<strong id="kpi-links">—</strong>
+<span>Accesos por vendedor</span>
+</article>
+<article class="kpi">
+<strong id="kpi-sellers">—</strong>
+<span>Vendedores activos</span>
+</article>
+</section>
+<section class="panel-section">
+<div class="section-head">
+<div>
+<h2>Actividad diaria</h2>
+<p>Visitas de los últimos 30 días</p>
+</div>
+</div>
+<div class="chart" id="daily-chart">
+</div>
+</section>
+<section class="panel-section">
+<div class="section-head">
+<div>
+<h2>Propiedades</h2>
+<p>Aperturas de ficha y clics a WhatsApp</p>
+</div>
+</div>
+<div class="unit-metrics" id="unit-metrics">
+</div>
+</section>
+<section class="panel-section">
+<div class="section-head">
+<div>
+<h2>Vendedores</h2>
+<p>Rendimiento atribuido a cada link personalizado</p>
+</div>
+<a class="ghost-button" href="/sumate" target="_blank">Nuevo vendedor</a>
+</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Vendedor</th>
+<th>Contacto</th>
+<th>Accesos</th>
+<th>Propiedades</th>
+<th>WhatsApp</th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody id="seller-table">
+</tbody>
+</table>
+</div>
+<nav class="seller-pagination" id="seller-pagination" aria-label="Páginas de vendedores" hidden>
+<button type="button" data-page="prev">← Anterior</button>
+<span></span>
+<button type="button" data-page="next">Siguiente →</button>
+</nav>
+</section>
+</main>
+</body>
+</html>
