@@ -46,7 +46,7 @@ Landing page comercial para un desarrollo inmobiliario a estrenar en Carlos Calv
 - Cuando se abre un link de vendedor, todos los CTA de WhatsApp y textos de contacto se personalizan con su nombre y teléfono.
 - `/panel` es privado y muestra visitas, sesiones, aperturas de propiedades, clics a WhatsApp y rendimiento por vendedor.
 - El listado de vendedores del panel se pagina visualmente de a 10 registros.
-- El footer conserva su composición original y muestra únicamente el logo negro de RE/MAX Encore en la columna derecha, sin placa ni texto adicional.
+- El footer conserva su composición original y muestra únicamente un logo negro y discreto de RE/MAX Encore en la columna derecha, sin placa ni texto adicional. La página `/sumate` mantiene su encabezado tipográfico original, sin logo.
 - Superusuario operativo: `jallaria@remax.com.ar`. Su contraseña no se versiona ni debe documentarse en el repositorio.
 - Eventos medidos: `page_view`, `seller_link_view`, `unit_view` y `whatsapp_click`.
 - Proyecto Supabase: `Carlos Calvo 2590`, referencia `ahgvuzeldnhxztbhcurt`, región São Paulo (`sa-east-1`).
