@@ -2,6 +2,30 @@
   publish = "."
 
 [[redirects]]
+  from = "http://carloscalvo2590.com/*"
+  to = "https://carloscalvo2590.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.carloscalvo2590.com/*"
+  to = "https://carloscalvo2590.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.carloscalvo2590.com/*"
+  to = "https://carloscalvo2590.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://carloscalvo2500.netlify.app/*"
+  to = "https://carloscalvo2590.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/sumate"
   to = "/alta-vendedor.html"
   status = 200
@@ -18,6 +42,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
 
 [[headers]]
   for = "/*.css"

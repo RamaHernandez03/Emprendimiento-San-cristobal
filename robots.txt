@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://carloscalvo2590.com/sitemap.xml
