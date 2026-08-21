@@ -1,4 +1,42 @@
-const WHATSAPP_NUMBER = '5491162740672';
+const DEFAULT_AGENT = Object.freeze({ name: 'un agente', whatsapp: '5491162740672', slug: null });
+let activeAgent = { ...DEFAULT_AGENT };
+const backend = window.CC_SUPABASE;
+
+const getSessionId = () => {
+  const key = 'cc2590_session';
+  let value = localStorage.getItem(key);
+  if (!value) {
+    value = crypto.randomUUID();
+    localStorage.setItem(key, value);
+  }
+  return value;
+};
+
+const apiRequest = async (payload, { keepalive = false } = {}) => {
+  if (!backend) return null;
+  try {
+    const response = await fetch(backend.functionUrl, {
+      method: 'POST',
+      headers: { apikey: backend.anonKey, Authorization: `Bearer ${backend.anonKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive
+    });
+    return response.ok ? response.json() : null;
+  } catch { return null; }
+};
+
+const trackedThisPage = new Set();
+const trackEvent = (eventType, { unitId = null, source = 'site' } = {}) => {
+  const dedupeKey = `${eventType}:${unitId ?? ''}:${source}`;
+  if ((eventType === 'page_view' || eventType === 'seller_link_view' || eventType === 'unit_view') && trackedThisPage.has(dedupeKey)) return;
+  trackedThisPage.add(dedupeKey);
+  void apiRequest({
+    action: 'track', eventType, unitId, source,
+    sellerSlug: activeAgent.slug,
+    sessionId: getSessionId(),
+    pagePath: `${location.pathname}${location.search}`
+  }, { keepalive: true });
+};
 
 const units = {
   1: {
@@ -39,11 +77,50 @@ const units = {
   }
 };
 
-const whatsappUrl = (message) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-document.querySelectorAll('.whatsapp').forEach((link) => {
-  link.href = whatsappUrl(link.dataset.message || 'Hola, quiero recibir información sobre Carlos Calvo 2590.');
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
+const whatsappUrl = (message) => `https://wa.me/${activeAgent.whatsapp}?text=${encodeURIComponent(message)}`;
+const replaceLinkText = (link, text) => {
+  const node = [...link.childNodes].find((item) => item.nodeType === Node.TEXT_NODE && item.textContent.trim());
+  if (node) node.textContent = ` ${text}`;
+};
+const applyCommercialLinks = () => {
+  document.querySelectorAll('.whatsapp').forEach((link) => {
+    link.href = whatsappUrl(link.dataset.message || 'Hola, quiero recibir información sobre Carlos Calvo 2590.');
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+  });
+  if (activeAgent.slug) {
+    const label = `Hablar con ${activeAgent.name.split(' ')[0]}`;
+    [document.querySelector('.header-cta'), document.querySelector('.faq .text-whatsapp'), document.querySelector('.contact .button')]
+      .filter(Boolean).forEach((link) => replaceLinkText(link, label));
+    const contactCopy = document.querySelector('.contact-inner>p:not(.eyebrow)');
+    if (contactCopy) contactCopy.textContent = `Consultá disponibilidad, financiación y gastos de la operación o coordiná una visita con ${activeAgent.name}.`;
+    const floating = document.querySelector('.floating-whatsapp');
+    floating?.setAttribute('aria-label', `Hablar con ${activeAgent.name} por WhatsApp`);
+    floating?.setAttribute('title', `Hablar con ${activeAgent.name}`);
+  }
+};
+
+const initializeCommercialLayer = async () => {
+  applyCommercialLinks();
+  const slug = new URLSearchParams(location.search).get('vendedor');
+  if (slug) {
+    const data = await apiRequest({ action: 'resolveSeller', slug });
+    if (data?.seller) {
+      activeAgent = data.seller;
+      applyCommercialLinks();
+      trackEvent('seller_link_view', { source: 'seller_link' });
+    }
+  }
+  trackEvent('page_view', { source: slug ? 'seller_link' : 'direct' });
+};
+void initializeCommercialLayer();
+
+document.addEventListener('click', (event) => {
+  const link = event.target.closest('.whatsapp');
+  if (!link) return;
+  const card = link.closest('[data-unit]');
+  const unitId = card ? Number(card.dataset.unit) : (link.id === 'dialog-whatsapp' ? activeUnit : null);
+  trackEvent('whatsapp_click', { unitId, source: link.id || link.className.split(' ')[0] || 'whatsapp' });
 });
 
 const header = document.querySelector('[data-header]');
@@ -186,6 +263,7 @@ const showImage = (image) => {
 };
 
 const openUnit = (id) => {
+  trackEvent('unit_view', { unitId: Number(id), source: 'property_detail' });
   activeUnit = Number(id);
   activeImage = 1;
   const unit = units[activeUnit];

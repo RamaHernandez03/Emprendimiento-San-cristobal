@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar en Carlos Calvo 2500, San Cristóbal, CABA. Debe ser rápida, clara, didáctica y especialmente cuidada en mobile y tablet. El destino de hosting previsto es Netlify.
+Landing page comercial para un desarrollo inmobiliario a estrenar en Carlos Calvo 2590, San Cristóbal, CABA. Debe ser rápida, clara, didáctica y especialmente cuidada en mobile y tablet. El sitio público continúa alojado en Netlify y utiliza Supabase para vendedores, atribución, métricas y autenticación del panel privado.
 
 ## Referencias recibidas
 
@@ -18,11 +18,11 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 - Se evita copiar RL70 literalmente. Se conserva lo valioso de su arquitectura de información: hero, proyecto, unidades, barrio, preguntas y CTA.
 - Las condiciones que pueden cambiar (precio, disponibilidad, entrega) no se duplican: se derivan a las fichas comerciales.
 - Las imágenes amuebladas deben identificarse como ilustrativas y potencialmente generadas con IA.
-- No se necesita backend en esta etapa. Para captar leads más adelante se puede usar Netlify Forms o un enlace de WhatsApp.
+- Netlify sirve los archivos estáticos y Supabase funciona como backend administrado. Ninguna clave privada se incluye en el navegador.
 
 ## Estado actual
 
-- Sitio estático funcional, sin build step ni backend.
+- Sitio estático funcional, sin build step, conectado a Supabase mediante una Edge Function pública validada y endpoints protegidos por Auth + RLS.
 - Toda la información comercial del proyecto y de las tres tipologías está publicada dentro del sitio.
 - La comercialización se presenta institucionalmente a nombre de **RE/MAX Encore**. Todas las acciones comerciales abren el WhatsApp configurado, sin focalizar la comunicación en una persona particular.
 - No existen enlaces a RE/MAX.
@@ -41,7 +41,15 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 - Navegación móvil, filtros de tipología, animaciones progresivas y FAQ accesible.
 - SEO básico, metadatos y contenido semántico incluidos.
 - El copy comercial distingue datos confirmados de condiciones sujetas a consulta. La sección de preguntas frecuentes cubre entrega, tipologías, edificio, gastos, financiación, expensas, reserva, material ilustrativo y vigencia de precios.
-- Listo para desplegar arrastrando la carpeta a Netlify o conectando el repo.
+- `/sumate` permite registrar vendedores y genera un link personal con `?vendedor=slug`.
+- Cuando se abre un link de vendedor, todos los CTA de WhatsApp y textos de contacto se personalizan con su nombre y teléfono.
+- `/panel` es privado y muestra visitas, sesiones, aperturas de propiedades, clics a WhatsApp y rendimiento por vendedor.
+- Superusuario operativo: `jallaria@remax.com.ar`. Su contraseña no se versiona ni debe documentarse en el repositorio.
+- Eventos medidos: `page_view`, `seller_link_view`, `unit_view` y `whatsapp_click`.
+- Proyecto Supabase: `Carlos Calvo 2590`, referencia `ahgvuzeldnhxztbhcurt`, región São Paulo (`sa-east-1`).
+- Edge Function: `public-api`, con acciones `resolveSeller`, `registerSeller` y `track`.
+- RLS activa en `admins`, `sellers` y `events`. Las vistas del panel usan `security_invoker=true`.
+- Listo para desplegar conectando el repositorio a Netlify.
 
 ## Pendientes imprescindibles antes de publicar
 
@@ -49,6 +57,7 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 2. Confirmar si la dirección comercial debe mostrarse como Carlos Calvo 2590 o Carlos Calvo 2500. Las descripciones recibidas indican 2590 y la ubicación resumida indica 2500; el sitio prioriza 2590.
 3. Confirmar disponibilidad y condiciones concretas de financiación.
 4. Agregar dominio, favicon, OG image, Analytics/Meta Pixel sólo si el cliente los solicita.
+5. Jorge debe cambiar la contraseña temporal del panel después de recibirla.
 
 ## Reglas de contenido
 
@@ -63,6 +72,12 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 - `styles.css`: sistema visual y responsive.
 - `script.js`: menú, filtros, header y animaciones.
 - `assets/images/`: galerías WebP optimizadas de las tres unidades.
+- `alta-vendedor.html` y `alta-vendedor.js`: registro público y generación del link personalizado.
+- `panel.html` y `panel.js`: autenticación y métricas comerciales privadas.
+- `portal.css`: estilos compartidos por alta y panel.
+- `supabase-config.js`: URL y clave publicable de Supabase; nunca contiene la service-role key.
+- `supabase/functions/public-api/index.ts`: API pública con validación de origen, clave publicable y datos de entrada.
+- `supabase/migrations/20260821174000_sales_network.sql`: esquema reproducible, RLS, vistas y permisos.
 
 ## Fuentes visuales del entorno
 
@@ -73,5 +88,5 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 
 Estas imágenes sólo ilustran puntos cercanos y deben mantener atribución documental. Antes de una campaña paga conviene confirmar la licencia de cada recurso o reemplazarlo por material propio.
 - `netlify.toml`: configuración de hosting y headers.
-- No hay base de datos, framework ni dependencias.
+- No hay framework ni dependencias de build. La persistencia y autenticación viven en Supabase.
 - CSS y JavaScript usan versionado de URL y revalidación en Netlify para evitar que los dispositivos conserven interfaces antiguas después de un deploy.
