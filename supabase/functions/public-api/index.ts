@@ -21,8 +21,8 @@ const cors = (origin: string | null) => ({
   'Vary': 'Origin'
 });
 
-const response = (body: unknown, status = 200, origin: string | null = null) =>
-  new Response(JSON.stringify(body), { status, headers: cors(origin) });
+const response = (body: unknown, status = 200, origin: string | null = null, extraHeaders: HeadersInit = {}) =>
+  new Response(JSON.stringify(body), { status, headers: { ...cors(origin), ...extraHeaders } });
 
 const db = async (path: string, init: RequestInit = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
   ...init,
@@ -48,6 +48,28 @@ const normalizeWhatsapp = (value: unknown) => {
   return /^\d{10}$/.test(digits) ? `549${digits}` : '';
 };
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const clientIp = (req: Request) => clean(
+  req.headers.get('cf-connecting-ip') ?? req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown',
+  80
+);
+const hashRateLimitKey = async (action: string, ip: string) => {
+  const key = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(SERVICE_KEY), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${action}:${ip}`));
+  return Array.from(new Uint8Array(signature), (byte) => byte.toString(16).padStart(2, '0')).join('');
+};
+const consumeRateLimit = async (req: Request, action: 'registerSeller' | 'track', limit: number) => {
+  const windowStart = new Date(Math.floor(Date.now() / 3_600_000) * 3_600_000).toISOString();
+  const keyHash = await hashRateLimitKey(action, clientIp(req));
+  const result = await db('rpc/consume_api_rate_limit', {
+    method: 'POST',
+    body: JSON.stringify({ p_key_hash: keyHash, p_action: action, p_window_start: windowStart, p_limit: limit })
+  });
+  if (!result.ok) return { allowed: false, unavailable: true };
+  const rows = await result.json();
+  return { allowed: rows[0]?.allowed === true, unavailable: false };
+};
 
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
@@ -72,6 +94,15 @@ Deno.serve(async (req) => {
   }
 
   if (action === 'registerSeller') {
+    if (clean(payload.website, 200)) return response({ seller: { pending: true } }, 201, origin);
+    const rateLimit = await consumeRateLimit(req, 'registerSeller', 10);
+    if (rateLimit.unavailable) return response({ error: 'No se pudo validar la solicitud. Intentá nuevamente.' }, 503, origin);
+    if (!rateLimit.allowed) return response(
+      { error: 'Se alcanzó el límite temporal de registros. Intentá nuevamente más tarde.' },
+      429,
+      origin,
+      { 'Retry-After': '3600' }
+    );
     const name = clean(payload.name, 100).replace(/\s+/g, ' ');
     const email = clean(payload.email, 254).toLowerCase();
     const whatsapp = normalizeWhatsapp(payload.whatsapp);
@@ -156,6 +187,9 @@ Deno.serve(async (req) => {
   }
 
   if (action === 'track') {
+    const rateLimit = await consumeRateLimit(req, 'track', 300);
+    if (rateLimit.unavailable) return response({ tracked: false }, 503, origin);
+    if (!rateLimit.allowed) return response({ tracked: false }, 429, origin, { 'Retry-After': '3600' });
     const eventType = clean(payload.eventType, 40);
     const allowedEvents = new Set(['page_view', 'seller_link_view', 'unit_view', 'whatsapp_click']);
     const sessionId = clean(payload.sessionId, 50);

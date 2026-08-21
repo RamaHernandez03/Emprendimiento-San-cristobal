@@ -43,7 +43,7 @@ form.addEventListener('submit', async (event) => {
   submitButton.disabled = true;
   submitButton.textContent = 'Generando…';
   try {
-    await apiRequest({ action:'registerSeller', name:data.get('name'), email:data.get('email'), whatsapp });
+    await apiRequest({ action:'registerSeller', name:data.get('name'), email:data.get('email'), whatsapp, website:data.get('website') });
     successBox.classList.add('show');
     form.reset();
   } catch (error) {
