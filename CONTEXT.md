@@ -22,7 +22,21 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 
 ## Estado actual
 
-- Sitio estático funcional, sin build step.
+- Sitio estático funcional, sin build step ni backend.
+- Toda la información comercial del proyecto y de las tres tipologías está publicada dentro del sitio.
+- Todas las acciones comerciales abren WhatsApp de Jorge Allaria: **+54 9 11 6274-0672**.
+- No existen enlaces a RE/MAX.
+- Las 56 imágenes recibidas fueron convertidas a WebP y optimizadas de aproximadamente 185 MB a 11 MB.
+- Galerías completas por unidad con navegación, miniaturas y teclado.
+- La galería del 2 ambientes contiene 19 fotografías; se eliminó la segunda imagen del orden anterior porque pertenecía a otra unidad.
+- Las ambientaciones ilustrativas de living funcionan como portada y aparecen primero en cada galería. El orden manual se define en la propiedad `images` de cada unidad dentro de `script.js`.
+- Toda la superficie de cada card abre su ficha (también mediante Enter o Espacio); el botón de WhatsApp conserva su acción independiente.
+- Se eliminaron las referencias visibles a UF B, UF C y “Unidad 2 ambientes”; las tipologías se comunican mediante títulos descriptivos.
+- Carrusel principal automático con 6 imágenes entregadas por el cliente, transición suave y controles manuales.
+- Sección de recorridos con 3 videos reales, uno por tipología. Los originales sumaban aproximadamente 326 MB; las versiones web 480p suman 53 MB y usan `preload="none"`, por lo que sólo se descargan al abrir el reproductor.
+- Collage visual del entorno con estaciones de Subte, UBA Psicología y Hospital Ramos Mejía.
+- La sección de ubicación prioriza la dirección Carlos Calvo 2590 y un mapa de Google Maps embebido, con CTA para coordinar una visita.
+- Animaciones progresivas de entrada respetando `prefers-reduced-motion`.
 - Responsive para desktop, iPad y mobile.
 - Navegación móvil, filtros de tipología, animaciones progresivas y FAQ accesible.
 - SEO básico, metadatos y contenido semántico incluidos.
@@ -30,17 +44,14 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 
 ## Pendientes imprescindibles antes de publicar
 
-1. Confirmar nombre oficial del emprendimiento.
-2. Confirmar teléfono/WhatsApp, nombre del asesor y oficina comercial.
-3. Descargar y autorizar las fotos originales del desarrollo. RE/MAX bloqueó la extracción automatizada de la galería, por lo que la versión inicial usa una dirección visual abstracta propia.
-4. Reemplazar las ilustraciones CSS por fotos locales optimizadas en WebP/AVIF, manteniendo texto alternativo.
-5. Confirmar superficies, orientación, piso, precio, entrega, amenities y terminaciones de cada tipología.
-6. Confirmar si se desea formulario Netlify o únicamente WhatsApp.
-7. Agregar dominio, favicon, OG image, Analytics/Meta Pixel sólo si el cliente los solicita.
+1. Confirmar nombre oficial del emprendimiento; actualmente se usa **Calvo 2590 / CC2590**.
+2. Confirmar si la dirección comercial debe mostrarse como Carlos Calvo 2590 o Carlos Calvo 2500. Las descripciones recibidas indican 2590 y la ubicación resumida indica 2500; el sitio prioriza 2590.
+3. Confirmar disponibilidad y condiciones concretas de financiación.
+4. Agregar dominio, favicon, OG image, Analytics/Meta Pixel sólo si el cliente los solicita.
 
 ## Reglas de contenido
 
-- No afirmar precios, fechas, financiación o disponibilidad sin confirmación comercial.
+- Los precios publicados provienen de la información entregada el 19/08/2026 y quedan sujetos a confirmación comercial.
 - No presentar renders ambientados como fotografías contractuales.
 - Mantener contacto y CTA visibles sin saturar la navegación.
 - Priorizar velocidad: imágenes locales menores a 250–350 KB, lazy loading debajo del hero y cero librerías innecesarias.
@@ -50,6 +61,15 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 - `index.html`: contenido y estructura.
 - `styles.css`: sistema visual y responsive.
 - `script.js`: menú, filtros, header y animaciones.
+- `assets/images/`: galerías WebP optimizadas de las tres unidades.
+
+## Fuentes visuales del entorno
+
+- Estación Jujuy: EnelSubte.
+- Estación Humberto I: Subte.ar.
+- UBA Psicología: Wikimedia Commons.
+- Hospital Ramos Mejía: Buenos Aires Ciudad.
+
+Estas imágenes sólo ilustran puntos cercanos y deben mantener atribución documental. Antes de una campaña paga conviene confirmar la licencia de cada recurso o reemplazarlo por material propio.
 - `netlify.toml`: configuración de hosting y headers.
 - No hay base de datos, framework ni dependencias.
-
