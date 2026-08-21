@@ -74,3 +74,4 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 Estas imágenes sólo ilustran puntos cercanos y deben mantener atribución documental. Antes de una campaña paga conviene confirmar la licencia de cada recurso o reemplazarlo por material propio.
 - `netlify.toml`: configuración de hosting y headers.
 - No hay base de datos, framework ni dependencias.
+- CSS y JavaScript usan versionado de URL y revalidación en Netlify para evitar que los dispositivos conserven interfaces antiguas después de un deploy.
