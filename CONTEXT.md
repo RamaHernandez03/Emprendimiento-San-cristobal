@@ -24,7 +24,7 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 
 - Sitio estático funcional, sin build step ni backend.
 - Toda la información comercial del proyecto y de las tres tipologías está publicada dentro del sitio.
-- Todas las acciones comerciales abren WhatsApp de Jorge Allaria: **+54 9 11 6274-0672**.
+- La comercialización se presenta institucionalmente a nombre de **RE/MAX Encore**. Todas las acciones comerciales abren el WhatsApp configurado, sin focalizar la comunicación en una persona particular.
 - No existen enlaces a RE/MAX.
 - Las 56 imágenes recibidas fueron convertidas a WebP y optimizadas de aproximadamente 185 MB a 11 MB.
 - Galerías completas por unidad con navegación, miniaturas y teclado.
@@ -32,7 +32,7 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 - Las ambientaciones ilustrativas de living funcionan como portada y aparecen primero en cada galería. El orden manual se define en la propiedad `images` de cada unidad dentro de `script.js`.
 - Toda la superficie de cada card abre su ficha (también mediante Enter o Espacio); el botón de WhatsApp conserva su acción independiente.
 - Se eliminaron las referencias visibles a UF B, UF C y “Unidad 2 ambientes”; las tipologías se comunican mediante títulos descriptivos.
-- Carrusel principal automático con 6 imágenes entregadas por el cliente, transición suave y controles manuales.
+- Carrusel principal automático con 6 imágenes entregadas por el cliente, en el orden manual 4, 5, 6, 2, 1, 3, con transición suave y controles manuales.
 - Sección de recorridos con 3 videos reales, uno por tipología. Los originales sumaban aproximadamente 326 MB; las versiones web 480p suman 53 MB y usan `preload="none"`, por lo que sólo se descargan al abrir el reproductor.
 - Collage visual del entorno con estaciones de Subte, UBA Psicología y Hospital Ramos Mejía.
 - La sección de ubicación prioriza la dirección Carlos Calvo 2590 y un mapa de Google Maps embebido, con CTA para coordinar una visita.
@@ -40,6 +40,7 @@ Landing page comercial 100% front-end para un desarrollo inmobiliario a estrenar
 - Responsive para desktop, iPad y mobile.
 - Navegación móvil, filtros de tipología, animaciones progresivas y FAQ accesible.
 - SEO básico, metadatos y contenido semántico incluidos.
+- El copy comercial distingue datos confirmados de condiciones sujetas a consulta. La sección de preguntas frecuentes cubre entrega, tipologías, edificio, gastos, financiación, expensas, reserva, material ilustrativo y vigencia de precios.
 - Listo para desplegar arrastrando la carpeta a Netlify o conectando el repo.
 
 ## Pendientes imprescindibles antes de publicar
