@@ -40,6 +40,18 @@ const getJson = async (path) => {
   if (!response.ok) throw new Error((await response.json().catch(() => ({}))).message || 'No se pudieron cargar los datos.');
   return response.json();
 };
+const adminAction = async (body) => {
+  const session = await getSession();
+  if (!session) throw new Error('La sesión venció. Volvé a ingresar.');
+  const response = await fetch(config.functionUrl, {
+    method:'POST',
+    headers:{ apikey:config.anonKey, Authorization:`Bearer ${session.access_token}`, 'Content-Type':'application/json' },
+    body:JSON.stringify(body)
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || 'No se pudo completar la operación.');
+  return result;
+};
 const number = (value) => new Intl.NumberFormat('es-AR').format(Number(value || 0));
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 
@@ -113,9 +125,15 @@ document.querySelector('#seller-pagination').addEventListener('click', (event) =
 const toggleSeller = async (button) => {
   const next = button.dataset.active !== 'true';
   button.disabled = true;
-  const response = await dataFetch(`sellers?id=eq.${encodeURIComponent(button.dataset.id)}`, { method:'PATCH', headers:{Prefer:'return=minimal'}, body:JSON.stringify({is_active:next}) });
-  if (!response.ok) panelMessage.textContent = 'No se pudo actualizar la aprobación del vendedor.';
+  let message = '';
+  try {
+    const result = await adminAction({ action:'setSellerStatus', sellerId:button.dataset.id, isActive:next });
+    if (result.emailSent) message = 'Vendedor aprobado. El link fue enviado por correo.';
+  } catch (error) {
+    message = error.message;
+  }
   await loadPanel();
+  panelMessage.textContent = message;
 };
 const loadPanel = async () => {
   panelMessage.textContent = '';

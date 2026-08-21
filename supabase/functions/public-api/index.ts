@@ -2,6 +2,7 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const PUBLISHABLE_KEY = 'sb_publishable_Uq7vjz4xbwXwRqWSFZwjHw_6tIlz2nX';
 const SITE_URL = 'https://carloscalvo2590.com';
 const allowedOrigins = new Set([
@@ -34,6 +35,9 @@ const db = async (path: string, init: RequestInit = {}) => fetch(`${SUPABASE_URL
 });
 
 const clean = (value: unknown, max = 200) => String(value ?? '').trim().slice(0, max);
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[char] ?? char));
 const slugify = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'vendedor';
 const normalizeWhatsapp = (value: unknown) => {
@@ -88,6 +92,67 @@ Deno.serve(async (req) => {
       return response({ error: 'No se pudo generar el link. Intentá nuevamente.' }, 500, origin);
     }
     return response({ seller: { name, slug, pending: true } }, 201, origin);
+  }
+
+  if (action === 'setSellerStatus') {
+    const sellerId = clean(payload.sellerId, 40);
+    const isActive = payload.isActive === true;
+    const accessToken = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ?? '';
+    if (!uuidPattern.test(sellerId) || !accessToken) return response({ error: 'Solicitud administrativa inválida.' }, 400, origin);
+
+    const userResult = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: PUBLISHABLE_KEY, Authorization: `Bearer ${accessToken}` }
+    });
+    if (!userResult.ok) return response({ error: 'La sesión venció. Volvé a ingresar.' }, 401, origin);
+    const user = await userResult.json();
+    const adminResult = await db(`admins?select=user_id&user_id=eq.${encodeURIComponent(user.id)}&limit=1`);
+    const admins = adminResult.ok ? await adminResult.json() : [];
+    if (!admins.length) return response({ error: 'Esta cuenta no tiene acceso administrador.' }, 403, origin);
+
+    const sellerResult = await db(`sellers?select=id,name,email,slug,is_active,approved_at&id=eq.${encodeURIComponent(sellerId)}&limit=1`);
+    const sellers = sellerResult.ok ? await sellerResult.json() : [];
+    const seller = sellers[0];
+    if (!seller) return response({ error: 'No se encontró el vendedor.' }, 404, origin);
+    const firstApproval = isActive && !seller.is_active && !seller.approved_at;
+
+    const updateBody: Record<string, unknown> = { is_active: isActive };
+    if (firstApproval) {
+      updateBody.approved_at = new Date().toISOString();
+      updateBody.approved_by = user.id;
+    }
+    const updateResult = await db(`sellers?id=eq.${encodeURIComponent(sellerId)}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify(updateBody)
+    });
+    if (!updateResult.ok) return response({ error: 'No se pudo actualizar la aprobación del vendedor.' }, 500, origin);
+
+    let emailSent = false;
+    if (firstApproval) {
+      if (!RESEND_API_KEY) return response({ error: 'El vendedor fue aprobado, pero falta configurar el servicio de correo.', approved: true }, 500, origin);
+      const sellerUrl = `${SITE_URL}/?vendedor=${encodeURIComponent(seller.slug)}`;
+      const safeName = escapeHtml(clean(seller.name, 100));
+      const safeUrl = escapeHtml(sellerUrl);
+      const emailResult = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'Carlos Calvo 2590 <notificaciones@carloscalvo2590.com>',
+          to: [seller.email],
+          reply_to: 'jorgeallaria67@gmail.com',
+          subject: 'Tu link de vendedor de Carlos Calvo 2590',
+          html: `<p>Hola ${safeName},</p><p>Tu link de vendedor es: <a href="${safeUrl}">${safeUrl}</a></p><p>Saludos,<br>Jorge Allaria</p>`,
+          text: `Hola ${clean(seller.name, 100)},\n\nTu link de vendedor es: ${sellerUrl}\n\nSaludos,\nJorge Allaria`
+        })
+      });
+      if (!emailResult.ok) {
+        const resendError = await emailResult.json().catch(() => ({}));
+        console.error('Resend error', resendError);
+        return response({ error: 'El vendedor fue aprobado, pero el correo no pudo enviarse. Revisá la verificación del dominio.', approved: true }, 502, origin);
+      }
+      emailSent = true;
+    }
+    return response({ updated: true, emailSent }, 200, origin);
   }
 
   if (action === 'track') {
