@@ -5,6 +5,7 @@ const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const PUBLISHABLE_KEY = 'sb_publishable_Uq7vjz4xbwXwRqWSFZwjHw_6tIlz2nX';
 const SITE_URL = 'https://carloscalvo2590.com';
+const ADMIN_EMAIL = 'jorgeallaria67@gmail.com';
 const allowedOrigins = new Set([
   SITE_URL,
   'https://www.carloscalvo2590.com',
@@ -38,6 +39,38 @@ const clean = (value: unknown, max = 200) => String(value ?? '').trim().slice(0,
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 }[char] ?? char));
+const sendRegistrationNotice = async (seller: { id: string; name: string; email: string; whatsapp: string }) => {
+  if (!RESEND_API_KEY) {
+    console.error('Registration notice skipped: RESEND_API_KEY is not configured.');
+    return false;
+  }
+  const safeName = escapeHtml(clean(seller.name, 100));
+  const safeEmail = escapeHtml(clean(seller.email, 254));
+  const safeWhatsapp = escapeHtml(clean(seller.whatsapp, 24));
+  const panelUrl = `${SITE_URL}/panel`;
+  const emailResult = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+      'Idempotency-Key': `seller-registration-${seller.id}`
+    },
+    body: JSON.stringify({
+      from: 'Carlos Calvo 2590 <notificaciones@carloscalvo2590.com>',
+      to: [ADMIN_EMAIL],
+      reply_to: seller.email,
+      subject: `Nuevo vendedor pendiente: ${clean(seller.name, 100)}`,
+      html: `<p>Hola Jorge,</p><p><strong>${safeName}</strong> se registró como vendedor y está esperando aprobación.</p><ul><li>Email: <a href="mailto:${safeEmail}">${safeEmail}</a></li><li>WhatsApp: +${safeWhatsapp}</li></ul><p><a href="${panelUrl}">Revisar y aprobar en el panel</a></p><p>Saludos,<br>Carlos Calvo 2590</p>`,
+      text: `Hola Jorge,\n\n${clean(seller.name, 100)} se registró como vendedor y está esperando aprobación.\n\nEmail: ${clean(seller.email, 254)}\nWhatsApp: +${clean(seller.whatsapp, 24)}\n\nRevisar y aprobar: ${panelUrl}\n\nSaludos,\nCarlos Calvo 2590`
+    })
+  });
+  if (!emailResult.ok) {
+    const resendError = await emailResult.json().catch(() => ({}));
+    console.error('Registration notice Resend error', resendError);
+    return false;
+  }
+  return true;
+};
 const slugify = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'vendedor';
 const normalizeWhatsapp = (value: unknown) => {
@@ -122,7 +155,12 @@ Deno.serve(async (req) => {
       if (error.code === '23505') return response({ error: 'Ya existe un vendedor registrado con ese email.' }, 409, origin);
       return response({ error: 'No se pudo generar el link. Intentá nuevamente.' }, 500, origin);
     }
-    return response({ seller: { name, slug, pending: true } }, 201, origin);
+    const createdSellers = await result.json();
+    const createdSeller = createdSellers[0];
+    const notificationSent = createdSeller
+      ? await sendRegistrationNotice({ id: createdSeller.id, name, email, whatsapp })
+      : false;
+    return response({ seller: { name, slug, pending: true }, notificationSent }, 201, origin);
   }
 
   if (action === 'subscribeLead') {
