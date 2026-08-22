@@ -42,38 +42,38 @@ const units = {
   1: {
     kicker: '2 ambientes · Al frente',
     title: '2 ambientes con balcón',
-    price: 'USD 91.400',
+    price: 'USD 91.200',
     specs: [['48 m²', 'superficie total'], ['42 m²', 'cubiertos'], ['6 m²', 'semicubiertos']],
     summary: 'Departamento de 2 ambientes al frente, con orientación Norte, dormitorio independiente y balcón de 6 m². Ofrece 42 m² cubiertos, vista abierta, buena entrada de luz y entrega inmediata.',
     features: ['2 ambientes', '1 dormitorio', '1 baño completo', 'Balcón al frente', 'Orientación Norte', 'Vista abierta', 'Cocina', 'Muy luminoso', 'Termotanque eléctrico', 'Preinstalación de aire acondicionado', 'Preinstalación para lavarropas', 'Entrega inmediata', 'Financiación disponible'],
     meta: ['Antigüedad: 0 años', 'Edificio: PB + 9 pisos', 'MLS-ID: 421531079-110', 'Ubicación: Carlos Calvo 2590, San Cristóbal'],
     images: [20, 18, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
     count: 19,
-    message: 'Hola, quiero consultar disponibilidad y condiciones por el departamento de 2 ambientes de 48 m² publicado a USD 91.400 (MLS 421531079-110).'
+    message: 'Hola, quiero consultar disponibilidad y condiciones por el departamento de 2 ambientes de 48 m² publicado a USD 91.200 (MLS 421531079-110).'
   },
   2: {
     kicker: 'Monoambiente · Contrafrente',
     title: 'Monoambiente compacto',
-    price: 'USD 52.900',
+    price: 'USD 52.800',
     specs: [['25 m²', 'superficie total'], ['25 m²', 'cubiertos'], ['1', 'ambiente']],
     summary: 'Monoambiente de 25 m² cubiertos al contrafrente, con orientación Sur, vista abierta y cocina eléctrica. Una planta compacta, a estrenar y con entrega inmediata.',
     features: ['1 ambiente', '1 baño completo', 'Al contrafrente', 'Orientación Sur', 'Vista abierta', 'Muy luminoso', 'Cocina eléctrica', 'Termotanque eléctrico', 'Preinstalación de aire acondicionado', 'Preinstalación para lavarropas', 'Entrega inmediata'],
     meta: ['Antigüedad: 0 años', 'Edificio: PB + 9 pisos', 'MLS-ID: 421531079-109', 'Ubicación: Carlos Calvo 2590, San Cristóbal'],
     images: [13, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     count: 13,
-    message: 'Hola, quiero consultar disponibilidad y condiciones por el monoambiente de 25 m² publicado a USD 52.900 (MLS 421531079-109).'
+    message: 'Hola, quiero consultar disponibilidad y condiciones por el monoambiente de 25 m² publicado a USD 52.800 (MLS 421531079-109).'
   },
   3: {
     kicker: 'Monoambiente · Contrafrente',
     title: 'Monoambiente amplio',
-    price: 'USD 62.500',
+    price: 'USD 62.400',
     specs: [['31 m²', 'superficie total'], ['31 m²', 'cubiertos'], ['1', 'ambiente']],
     summary: 'Monoambiente de 31 m² cubiertos al contrafrente, con orientación Sur, vista abierta y cocina eléctrica. Una alternativa de mayor superficie, a estrenar y con entrega inmediata.',
     features: ['1 ambiente', '1 baño completo', 'Al contrafrente', 'Orientación Sur', 'Vista abierta', 'Muy luminoso', 'Cocina eléctrica', 'Termotanque eléctrico', 'Preinstalación de aire acondicionado', 'Preinstalación para lavarropas', 'Entrega inmediata'],
     meta: ['Antigüedad: 0 años', 'Edificio: PB + 9 pisos', 'MLS-ID: 421531079-108', 'Ubicación: Carlos Calvo 2590, San Cristóbal'],
     images: [23, 22, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
     count: 23,
-    message: 'Hola, quiero consultar disponibilidad y condiciones por el monoambiente de 31 m² publicado a USD 62.500 (MLS 421531079-108).'
+    message: 'Hola, quiero consultar disponibilidad y condiciones por el monoambiente de 31 m² publicado a USD 62.400 (MLS 421531079-108).'
   }
 };
 
