@@ -1,4 +1,4 @@
-const DEFAULT_AGENT = Object.freeze({ name: 'un agente', whatsapp: '5491162740672', slug: null });
+const DEFAULT_AGENT = Object.freeze({ name: 'Jorge Allaria', email: 'jallaria@remax.com.ar', whatsapp: '5491162740672', slug: null });
 let activeAgent = { ...DEFAULT_AGENT };
 const backend = window.CC_SUPABASE;
 
@@ -82,6 +82,28 @@ const replaceLinkText = (link, text) => {
   const node = [...link.childNodes].find((item) => item.nodeType === Node.TEXT_NODE && item.textContent.trim());
   if (node) node.textContent = ` ${text}`;
 };
+const displayWhatsapp = (value) => {
+  const digits = String(value ?? '').replace(/\D/g, '');
+  const national = digits.startsWith('549') ? digits.slice(3) : digits;
+  if (national.startsWith('11') && national.length === 10) return `+54 9 11 ${national.slice(2, 6)}-${national.slice(6)}`;
+  return digits.startsWith('549') ? `+54 9 ${national}` : `+${digits}`;
+};
+const applyMapContact = () => {
+  const contactName = document.querySelector('#map-contact-name');
+  const contactPhone = document.querySelector('#map-contact-phone');
+  const contactEmail = document.querySelector('#map-contact-email');
+  if (contactName) contactName.textContent = activeAgent.name;
+  if (contactPhone) {
+    contactPhone.textContent = displayWhatsapp(activeAgent.whatsapp);
+    contactPhone.href = whatsappUrl('Hola, quiero recibir información sobre Carlos Calvo 2590.');
+    contactPhone.target = '_blank';
+    contactPhone.rel = 'noopener noreferrer';
+  }
+  if (contactEmail) {
+    contactEmail.textContent = activeAgent.email;
+    contactEmail.href = `mailto:${activeAgent.email}`;
+  }
+};
 const applyCommercialLinks = () => {
   document.querySelectorAll('.whatsapp').forEach((link) => {
     link.href = whatsappUrl(link.dataset.message || 'Hola, quiero recibir información sobre Carlos Calvo 2590.');
@@ -98,6 +120,7 @@ const applyCommercialLinks = () => {
     floating?.setAttribute('aria-label', `Hablar con ${activeAgent.name} por WhatsApp`);
     floating?.setAttribute('title', `Hablar con ${activeAgent.name}`);
   }
+  applyMapContact();
 };
 
 const initializeCommercialLayer = async () => {

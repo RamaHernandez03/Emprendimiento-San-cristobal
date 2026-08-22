@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
   if (action === 'resolveSeller') {
     const slug = clean(payload.slug, 64).toLowerCase();
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return response({ seller: null }, 200, origin);
-    const result = await db(`sellers?select=name,whatsapp,slug&slug=eq.${encodeURIComponent(slug)}&is_active=eq.true&limit=1`);
+    const result = await db(`sellers?select=name,email,whatsapp,slug&slug=eq.${encodeURIComponent(slug)}&is_active=eq.true&limit=1`);
     if (!result.ok) return response({ error: 'No se pudo consultar el vendedor.' }, 500, origin);
     const rows = await result.json();
     return response({ seller: rows[0] ?? null }, 200, origin);
