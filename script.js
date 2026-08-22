@@ -113,6 +113,38 @@ const initializeCommercialLayer = async () => {
   }
   trackEvent('page_view', { source: slug ? 'seller_link' : 'direct' });
 };
+
+const leadForm = document.querySelector('#lead-form');
+const leadStatus = document.querySelector('#lead-status');
+leadForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const submitButton = leadForm.querySelector('button[type="submit"]');
+  const formData = new FormData(leadForm);
+  submitButton.disabled = true;
+  submitButton.textContent = 'Guardando…';
+  leadStatus.className = 'lead-status';
+  leadStatus.textContent = '';
+
+  const result = await apiRequest({
+    action: 'subscribeLead',
+    email: formData.get('email'),
+    consent: formData.get('consent') === 'on',
+    website: formData.get('website'),
+    sellerSlug: activeAgent.slug,
+    source: activeAgent.slug ? 'seller_link' : 'site'
+  });
+
+  if (result?.subscribed) {
+    leadForm.reset();
+    leadStatus.className = 'lead-status success';
+    leadStatus.textContent = '¡Listo! Tu correo quedó registrado.';
+  } else {
+    leadStatus.className = 'lead-status error';
+    leadStatus.textContent = 'No pudimos guardar tu correo. Revisalo e intentá nuevamente.';
+  }
+  submitButton.disabled = false;
+  submitButton.textContent = 'Quiero recibir novedades';
+});
 void initializeCommercialLayer();
 
 document.addEventListener('click', (event) => {

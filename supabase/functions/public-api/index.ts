@@ -59,7 +59,7 @@ const hashRateLimitKey = async (action: string, ip: string) => {
   const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${action}:${ip}`));
   return Array.from(new Uint8Array(signature), (byte) => byte.toString(16).padStart(2, '0')).join('');
 };
-const consumeRateLimit = async (req: Request, action: 'registerSeller' | 'track', limit: number) => {
+const consumeRateLimit = async (req: Request, action: 'registerSeller' | 'track' | 'subscribeLead', limit: number) => {
   const windowStart = new Date(Math.floor(Date.now() / 3_600_000) * 3_600_000).toISOString();
   const keyHash = await hashRateLimitKey(action, clientIp(req));
   const result = await db('rpc/consume_api_rate_limit', {
@@ -123,6 +123,45 @@ Deno.serve(async (req) => {
       return response({ error: 'No se pudo generar el link. Intentá nuevamente.' }, 500, origin);
     }
     return response({ seller: { name, slug, pending: true } }, 201, origin);
+  }
+
+  if (action === 'subscribeLead') {
+    if (clean(payload.website, 200)) return response({ subscribed: true }, 201, origin);
+    const rateLimit = await consumeRateLimit(req, 'subscribeLead', 8);
+    if (rateLimit.unavailable) return response({ error: 'No se pudo validar la solicitud. Intentá nuevamente.' }, 503, origin);
+    if (!rateLimit.allowed) return response(
+      { error: 'Se alcanzó el límite temporal de registros. Intentá nuevamente más tarde.' },
+      429,
+      origin,
+      { 'Retry-After': '3600' }
+    );
+
+    const email = clean(payload.email, 254).toLowerCase();
+    const consent = payload.consent === true;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return response({ error: 'Ingresá un email válido.' }, 422, origin);
+    if (!consent) return response({ error: 'Necesitamos tu consentimiento para enviarte novedades.' }, 422, origin);
+
+    const sellerSlug = clean(payload.sellerSlug, 64).toLowerCase();
+    let sellerId: string | null = null;
+    if (sellerSlug) {
+      const sellerResult = await db(`sellers?select=id&slug=eq.${encodeURIComponent(sellerSlug)}&is_active=eq.true&limit=1`);
+      if (sellerResult.ok) sellerId = (await sellerResult.json())[0]?.id ?? null;
+    }
+    const source = clean(payload.source, 80).replace(/[^a-zA-Z0-9_\-.:]/g, '') || 'site';
+    const result = await db('lead_subscribers?on_conflict=email', {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({
+        email,
+        source,
+        seller_id: sellerId,
+        consent_version: '2026-08-22',
+        consented_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+    });
+    if (!result.ok) return response({ error: 'No pudimos guardar tu email. Intentá nuevamente.' }, 500, origin);
+    return response({ subscribed: true }, 201, origin);
   }
 
   if (action === 'setSellerStatus') {
