@@ -5,7 +5,7 @@ const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const PUBLISHABLE_KEY = 'sb_publishable_Uq7vjz4xbwXwRqWSFZwjHw_6tIlz2nX';
 const SITE_URL = 'https://carloscalvo2590.com';
-const ADMIN_EMAIL = 'jorgeallaria67@gmail.com';
+const ADMIN_NOTIFICATION_EMAILS = ['jorgeallaria67@gmail.com', 'contacto.soyeliana@gmail.com'];
 const allowedOrigins = new Set([
   SITE_URL,
   'https://www.carloscalvo2590.com',
@@ -57,7 +57,7 @@ const sendRegistrationNotice = async (seller: { id: string; name: string; email:
     },
     body: JSON.stringify({
       from: 'Carlos Calvo 2590 <notificaciones@carloscalvo2590.com>',
-      to: [ADMIN_EMAIL],
+      to: ADMIN_NOTIFICATION_EMAILS,
       reply_to: seller.email,
       subject: `Nuevo vendedor pendiente: ${clean(seller.name, 100)}`,
       html: `<p>Hola Jorge,</p><p><strong>${safeName}</strong> se registró como vendedor y está esperando aprobación.</p><ul><li>Email: <a href="mailto:${safeEmail}">${safeEmail}</a></li><li>WhatsApp: +${safeWhatsapp}</li></ul><p><a href="${panelUrl}">Revisar y aprobar en el panel</a></p><p>Saludos,<br>Carlos Calvo 2590</p>`,
